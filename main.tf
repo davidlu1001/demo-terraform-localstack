@@ -2,7 +2,7 @@ provider "aws" {
   region                      = "ap-southeast-2"
   access_key                  = "test"
   secret_key                  = "test"
-  s3_force_path_style         = true
+  s3_use_path_style           = true
   skip_credentials_validation = true
   skip_metadata_api_check     = true
   skip_requesting_account_id  = true
@@ -32,17 +32,9 @@ provider "aws" {
 
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "terraform-state"
-  acl    = "private"
-  versioning {
-    enabled = true
-  }
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
+  tags = {
+    Name        = "terraform-state"
+    Environment = "dev"
   }
 
   lifecycle {
@@ -63,11 +55,15 @@ resource "aws_dynamodb_table" "terraform_state_lock" {
   name           = "terraform-lock"
   read_capacity  = 5
   write_capacity = 5
-  billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "LockID"
 
   attribute {
     name = "LockID"
     type = "S"
+  }
+
+  tags = {
+    Name        = "terraform-lock"
+    Environment = "dev"
   }
 }
