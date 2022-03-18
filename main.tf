@@ -32,13 +32,15 @@ provider "aws" {
 
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "terraform-state"
+
+  force_destroy = true
   tags = {
     Name        = "terraform-state"
     Environment = "dev"
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
